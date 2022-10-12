@@ -9,6 +9,11 @@
   "private": true,
   "scripts": {
     "start": "wrangler dev",
-    "deploy": "wrangler publish"
+    "deploy": "wrangler publish",
+    "trigger": "curl http://localhost:8787/cdn-cgi/mf/scheduled"
+  },
+  "dependencies": {
+    "@urql/core": "^3.0.3",
+    "graphql": "^16.6.0"
   }
 }

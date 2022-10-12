@@ -10,6 +10,8 @@
  * Learn more at https://developers.cloudflare.com/workers/runtime-apis/scheduled-event/
  */
 
+import { Snapshot } from "./subgraph";
+
 export interface Env {
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
 	// MY_KV_NAMESPACE: KVNamespace;
@@ -21,6 +23,15 @@ export interface Env {
 	// MY_BUCKET: R2Bucket;
 }
 
+/**
+ * Runtime variables
+ * - Webhook
+ */
+
+const isInBounds = (previousSnapshot: Snapshot, snapshot: Snapshot): boolean => {
+	return false;
+}
+
 export default {
 	async scheduled(
 		controller: ScheduledController,
@@ -28,5 +39,21 @@ export default {
 		ctx: ExecutionContext
 	): Promise<void> {
 		console.log(`Hello World!`);
+
+		// Grab the latest block
+
+		// Grab contract ids at the latest block
+
+		// Loop through contracts
+
+		// Loop through contract ids
+
+		// Grab the previous data
+
+		// If no previous data, store
+
+		// If within bounds, skip
+
+		// Otherwise alert in Discord
 	},
 };
