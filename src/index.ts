@@ -29,6 +29,7 @@ export interface Env {
  */
 
 const isInBounds = (runData: SnapshotRunData, snapshot: Snapshot): boolean => {
+  // TODO
   return false;
 };
 
@@ -41,7 +42,7 @@ const checkSnapshot = async (key: string, value: Snapshot): Promise<void> => {
   // Grab the previous data
   console.log("key = " + key);
   console.log("value = " + JSON.stringify(value));
-  console.log("values = " + JSON.stringify(await RunData.list()));
+  // console.log("values = " + (await RunData.list()).keys);
   const previousRunDataString = await RunData.get(key, "json") as SnapshotRunData;
   console.log("previous = " + previousRunDataString);
 
@@ -66,18 +67,22 @@ const checkSnapshot = async (key: string, value: Snapshot): Promise<void> => {
   console.warn(`Out of bounds`);
 }
 
+const performCheck = async (): Promise<void> => {
+  // Grab the latest block
+  const client = getClient("https://api.studio.thegraph.com/query/28103/bonds/0.0.9");
+  const latestBlock = await getLatestBlock(client);
+
+  // Grab snapshots at the latest block
+  const snapshotMap: SnapshotMap = await getSnapshots(client, latestBlock);
+
+  // Loop through contracts
+  for (const [key, value] of snapshotMap) {
+    await checkSnapshot(key, value);
+  }
+}
+
 export default {
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
-    // Grab the latest block
-    const client = getClient("https://api.studio.thegraph.com/query/28103/bonds/0.0.9");
-    const latestBlock = await getLatestBlock(client);
-
-    // Grab snapshots at the latest block
-    const snapshotMap: SnapshotMap = await getSnapshots(client, latestBlock);
-
-    // Loop through contracts
-    for (const [key, value] of snapshotMap) {
-      await checkSnapshot(key, value);
-    }
+    ctx.waitUntil(performCheck());
   },
 };
