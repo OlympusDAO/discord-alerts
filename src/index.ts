@@ -13,6 +13,7 @@
 import { getClient, getLatestBlock, getSnapshots, Snapshot, SnapshotMap } from "./subgraph";
 
 export interface Env {
+	KV: KVNamespace;
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
 	// MY_KV_NAMESPACE: KVNamespace;
 	//
@@ -30,14 +31,10 @@ export interface Env {
 
 const isInBounds = (previousSnapshot: Snapshot, snapshot: Snapshot): boolean => {
 	return false;
-}
+};
 
 export default {
-	async scheduled(
-		controller: ScheduledController,
-		env: Env,
-		ctx: ExecutionContext
-	): Promise<void> {
+	async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
 		// Grab the latest block
 		const client = getClient("https://api.studio.thegraph.com/query/28103/bonds/0.0.9");
 		const latestBlock = await getLatestBlock(client);

@@ -8,6 +8,7 @@
     "@graphql-codegen/typescript-operations": "^2.5.4",
     "@types/node": "^18.8.4",
     "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "@typescript-eslint/parser": "^5.40.0",
     "eslint": "^8.23.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-babel": "^5.3.1",
@@ -26,7 +27,9 @@
     "start": "wrangler dev",
     "deploy": "wrangler publish",
     "trigger": "curl http://localhost:8787/cdn-cgi/mf/scheduled",
-    "codegen": "graphql-codegen"
+    "codegen": "graphql-codegen",
+    "lint": "eslint --config ./.eslintrc.js ./src/ --ext .jsx,.js,.tsx,.ts",
+    "lint:fix": "prettier --write ./src/ & yarn lint --fix"
   },
   "dependencies": {
     "@urql/core": "^3.0.3",

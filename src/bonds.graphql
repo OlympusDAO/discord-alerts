@@ -1,17 +1,17 @@
 query BondSnapshotsLatestBlockQuery {
-    bondSnapshots(orderBy: block, orderDirection: desc, first: 1) {
-        block
-    }
+  bondSnapshots(orderBy: block, orderDirection: desc, first: 1) {
+    block
+  }
 }
 
-query BondSnapshotsQuery ($block: BigInt!) {
-        bondSnapshots(orderBy: block, orderDirection: desc, where: {block: $block}) {
-            id
-            date
-            timestamp
-            contractAddress
-            contractId
-            price
-            debtDecayIntervalSeconds
-        }
-    }
+query BondSnapshotsQuery($block: BigInt!) {
+  bondSnapshots(orderBy: block, orderDirection: desc, where: { block: $block }) {
+    id
+    date
+    timestamp
+    contractAddress
+    contractId
+    price
+    debtDecayIntervalSeconds
+  }
+}
