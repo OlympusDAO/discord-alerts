@@ -1,0 +1,6 @@
+name = "discord-alerts"
+main = "src/index.ts"
+compatibility_date = "2022-10-12"
+
+[triggers]
+crons = [ "1 * * * *" ]
