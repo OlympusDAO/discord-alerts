@@ -3,6 +3,21 @@
   "version": "0.0.0",
   "devDependencies": {
     "@cloudflare/workers-types": "^3.16.0",
+    "@graphql-codegen/cli": "^2.13.6",
+    "@graphql-codegen/typed-document-node": "^2.3.4",
+    "@graphql-codegen/typescript-operations": "^2.5.4",
+    "@types/node": "^18.8.4",
+    "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "eslint": "^8.23.1",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-no-relative-import-paths": "^1.4.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-simple-import-sort": "^8.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "prettier": "^2.7.1",
+    "ts-node": "^10.9.1",
     "typescript": "^4.8.4",
     "wrangler": "2.1.11"
   },
@@ -10,7 +25,8 @@
   "scripts": {
     "start": "wrangler dev",
     "deploy": "wrangler publish",
-    "trigger": "curl http://localhost:8787/cdn-cgi/mf/scheduled"
+    "trigger": "curl http://localhost:8787/cdn-cgi/mf/scheduled",
+    "codegen": "graphql-codegen"
   },
   "dependencies": {
     "@urql/core": "^3.0.3",

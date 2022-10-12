@@ -1,0 +1,16 @@
+schema: https://api.studio.thegraph.com/query/28103/bonds/0.0.9
+documents: "./src/**/*.graphql"
+generates:
+  ./src/generated/graphql-operations.ts:
+   plugins:
+    - typescript
+    - typescript-operations
+    - typed-document-node
+   config:
+      scalars:
+        BigDecimal: number
+        BigInt: number
+        Bytes: Uint8Array # https://thegraph.com/docs/en/developing/assemblyscript-api/#bytes
+   hooks:
+    afterOneFileWrite:
+      - yarn eslint --config ./.eslintrc.js --fix

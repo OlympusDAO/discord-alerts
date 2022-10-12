@@ -10,7 +10,7 @@
  * Learn more at https://developers.cloudflare.com/workers/runtime-apis/scheduled-event/
  */
 
-import { Snapshot } from "./subgraph";
+import { getClient, getLatestBlock, getSnapshots, Snapshot, SnapshotMap } from "./subgraph";
 
 export interface Env {
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
@@ -38,22 +38,24 @@ export default {
 		env: Env,
 		ctx: ExecutionContext
 	): Promise<void> {
-		console.log(`Hello World!`);
-
 		// Grab the latest block
+		const client = getClient("https://api.studio.thegraph.com/query/28103/bonds/0.0.9");
+		const latestBlock = await getLatestBlock(client);
 
-		// Grab contract ids at the latest block
+		// Grab snapshots at the latest block
+		const snapshotMap: SnapshotMap = await getSnapshots(client, latestBlock);
 
 		// Loop through contracts
+		snapshotMap.forEach((value, key) => {
+			console.log(`snapshot = ${JSON.stringify(value)}`);
+			// Grab the previous data
+			const existingSnapshot = null;
 
-		// Loop through contract ids
+			// If no previous data, store
 
-		// Grab the previous data
+			// If within bounds, skip
 
-		// If no previous data, store
-
-		// If within bounds, skip
-
-		// Otherwise alert in Discord
+			// Otherwise alert in Discord
+		});
 	},
 };

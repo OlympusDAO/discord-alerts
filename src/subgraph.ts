@@ -1,47 +1,63 @@
-import { gql } from "@urql/core";
+import { Client, createClient, gql } from "@urql/core";
+import { BondSnapshot, BondSnapshotsLatestBlockQueryDocument, BondSnapshotsQueryDocument } from "./generated/graphql-operations";
 
-const BondSnapshotsLatestBlockQuery = gql`
-    query {
-        bondSnapshots(orderBy: block, orderDirection: desc, first: 1) {
-            block
-        }
-    }
-`;
-
-const BondSnapshotsQuery = gql`
-    query ($block: String!) {
-        bondSnapshots(orderBy: block, orderDirection: desc, where: {block: $block}) {
-            id
-            date
-            timestamp
-            contractAddress
-            contractId
-            price
-            debtDecayIntervalSeconds
-        }
-    }
-`;
-
-export const getLatestBlock = (): number => {
-    return -1;
+export const getClient = (url: string): Client => {
+    return createClient({
+        url: url,
+    });
 }
 
+export const getLatestBlock = async (client: Client): Promise<number> => {
+    const query = await client.query(BondSnapshotsLatestBlockQueryDocument, {}).toPromise();
+
+    if (!query.data || query.data.bondSnapshots.length === 0) {
+        throw new Error("Unable to determine latest block");
+    }
+
+    const latestBlock = query.data.bondSnapshots[0].block;
+    console.info(`Latest block is ${latestBlock}`);
+    return latestBlock;
+}
+
+// We define our own type, as we do not need all of the fields in BondSnapshot
 export type Snapshot = {
     id: string;
     date: string;
     timestamp: number;
     contractAddress: string;
-    contractId: string;
-    price: string; // BigNumber?
+    contractId: number;
+    price: number; // BigNumber?
     debtDecayIntervalSeconds: number;
 }
 
-export type SnapshotMap = {
-    [contractAddress: string]: {
-        [contractId: string]: Snapshot;
-    }
-}
+export type SnapshotMap = Map<string, Snapshot>;
 
-export const getSnapshots = (block: number): SnapshotMap => {
-    return {};
+export const getSnapshots = async (client: Client, block: number): Promise<SnapshotMap> => {
+    const query = await client.query(BondSnapshotsQueryDocument, { block: block }).toPromise();
+
+    if (!query.data) {
+        throw new Error("Unable to obtain snapshots");
+    }
+    
+    const results = query.data.bondSnapshots;
+
+    // Extract the snapshots into the map
+    const snapshotsMap = new Map<string, Snapshot>();
+    results.forEach((value) => {
+        const snapshotMapId = `${value.contractAddress}/${value.contractId}`;
+
+        // For each block, there should only be one permutation of contractAddress and contractId, so be defensive.
+        if (snapshotsMap.has(snapshotMapId)) {
+            throw new Error(`Did not expect to find existing value for snapshot map id ${snapshotMapId}`);
+        }
+
+        const compatibleValue: Snapshot = {
+            ...value,
+            contractAddress: value.contractAddress.toString(),
+        }
+
+        snapshotsMap.set(snapshotMapId, compatibleValue);
+    })
+
+    return snapshotsMap;
 }
