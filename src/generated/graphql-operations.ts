@@ -625,6 +625,11 @@ export const BondSnapshotsQueryDocument = {
                       name: { kind: "Name", value: "block" },
                       value: { kind: "Variable", name: { kind: "Name", value: "block" } },
                     },
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "isLive" },
+                      value: { kind: "BooleanValue", value: true },
+                    },
                   ],
                 },
               },

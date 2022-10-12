@@ -5,7 +5,7 @@ query BondSnapshotsLatestBlockQuery {
 }
 
 query BondSnapshotsQuery($block: BigInt!) {
-  bondSnapshots(orderBy: block, orderDirection: desc, where: { block: $block }) {
+  bondSnapshots(orderBy: block, orderDirection: desc, where: { block: $block, isLive: true }) {
     id
     date
     timestamp
