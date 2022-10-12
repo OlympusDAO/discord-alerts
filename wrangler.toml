@@ -2,9 +2,9 @@ name = "discord-alerts"
 main = "src/index.ts"
 compatibility_date = "2022-10-12"
 
+kv_namespaces = [
+  { binding = "RunData", id = "e41f2f32dae64d9099d7afa63784a345", preview_id = "ab468d73d63f4c7f957392a78faaf146" }
+]
+
 [triggers]
 crons = [ "1 * * * *" ]
-
-kv_namespaces = [
-    { binding = "KV", id = "e41f2f32dae64d9099d7afa63784a345" }
-]
