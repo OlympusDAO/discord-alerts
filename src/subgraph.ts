@@ -41,6 +41,7 @@ export const getSnapshots = async (client: Client, block: number): Promise<Snaps
   }
 
   const results = query.data.bondSnapshots;
+  console.info(`Received ${results.length} records`);
 
   // Extract the snapshots into the map
   const snapshotsMap = new Map<string, Snapshot>();
