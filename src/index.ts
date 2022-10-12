@@ -13,14 +13,8 @@
 import { getClient, getLatestBlock, getSnapshots, Snapshot, SnapshotMap } from "./subgraph";
 
 export interface Env {
-  // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
-  // MY_KV_NAMESPACE: KVNamespace;
-  //
-  // Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
-  // MY_DURABLE_OBJECT: DurableObjectNamespace;
-  //
-  // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
-  // MY_BUCKET: R2Bucket;
+  // See binding in wrangler.toml
+  RunData: KVNamespace;
 }
 
 /**
@@ -38,27 +32,23 @@ type SnapshotRunData = {
   price: number;
 }
 
-const checkSnapshot = async (key: string, value: Snapshot): Promise<void> => {
+const checkSnapshot = async (kv: KVNamespace, key: string, value: Snapshot): Promise<void> => {
   // Grab the previous data
-  console.log("key = " + key);
-  console.log("value = " + JSON.stringify(value));
-  // console.log("values = " + (await RunData.list()).keys);
-  const previousRunDataString = await RunData.get(key, "json") as SnapshotRunData;
-  console.log("previous = " + previousRunDataString);
+  const previousRunDataString = await kv.get(key);
 
   // If no previous data, store
   if (!previousRunDataString) {
     console.info(`No run data found for Bond contract ${key}. Storing.`);
-    await RunData.put(key, JSON.stringify({
+    await kv.put(key, JSON.stringify({
       timestamp: value.timestamp,
       price: value.price,
     }));
     return;
   }
-  // const previousRunData = JSON.parse(previousRunDataString) as SnapshotRunData;
+  const previousRunData = JSON.parse(previousRunDataString) as SnapshotRunData;
 
   // If within bounds, skip
-  if (isInBounds(previousRunDataString, value)) {
+  if (isInBounds(previousRunData, value)) {
     console.info(`Within bounds`);
     return;
   }
@@ -67,22 +57,18 @@ const checkSnapshot = async (key: string, value: Snapshot): Promise<void> => {
   console.warn(`Out of bounds`);
 }
 
-const performCheck = async (): Promise<void> => {
-  // Grab the latest block
-  const client = getClient("https://api.studio.thegraph.com/query/28103/bonds/0.0.9");
-  const latestBlock = await getLatestBlock(client);
-
-  // Grab snapshots at the latest block
-  const snapshotMap: SnapshotMap = await getSnapshots(client, latestBlock);
-
-  // Loop through contracts
-  for (const [key, value] of snapshotMap) {
-    await checkSnapshot(key, value);
-  }
-}
-
 export default {
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
-    ctx.waitUntil(performCheck());
-  },
+    // Grab the latest block
+    const client = getClient("https://api.studio.thegraph.com/query/28103/bonds/0.0.9");
+    const latestBlock = await getLatestBlock(client);
+
+    // Grab snapshots at the latest block
+    const snapshotMap: SnapshotMap = await getSnapshots(client, latestBlock);
+
+    // Loop through contracts
+    for (const [key, value] of snapshotMap) {
+      checkSnapshot(env.RunData, key, value);
+    }
+  }
 };
