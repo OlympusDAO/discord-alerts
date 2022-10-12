@@ -13,6 +13,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-no-async-foreach": "^0.1.1",
     "eslint-plugin-no-relative-import-paths": "^1.4.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-simple-import-sort": "^8.0.0",
@@ -24,7 +25,7 @@
   },
   "private": true,
   "scripts": {
-    "start": "wrangler dev",
+    "start": "wrangler dev --local",
     "deploy": "wrangler publish",
     "trigger": "curl http://localhost:8787/cdn-cgi/mf/scheduled",
     "codegen": "graphql-codegen",

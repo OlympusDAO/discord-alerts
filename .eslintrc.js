@@ -17,7 +17,7 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/eslint-recommended",
   ],
-  plugins: ["@typescript-eslint", "simple-import-sort", "unused-imports"],
+  plugins: ["@typescript-eslint", "simple-import-sort", "unused-imports", "no-async-foreach"],
   rules: {
     "prettier/prettier": ["error"],
     "import/prefer-default-export": "off",
@@ -34,6 +34,7 @@ module.exports = {
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/ban-ts-ignore": "off",
+    "no-async-foreach/no-async-foreach": 2
   },
   ignorePatterns: ["build", "node_modules"],
   globals: {
