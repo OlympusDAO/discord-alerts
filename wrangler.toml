@@ -3,8 +3,20 @@ main = "src/index.ts"
 compatibility_date = "2022-10-12"
 
 kv_namespaces = [
-  { binding = "RunData", id = "e41f2f32dae64d9099d7afa63784a345", preview_id = "ab468d73d63f4c7f957392a78faaf146" }
+  # `wrangler dev` will complain if preview_id is not defined
+  { binding = "RunData", id = "ab468d73d63f4c7f957392a78faaf146", preview_id = "ab468d73d63f4c7f957392a78faaf146" }
 ]
 
 [triggers]
 crons = [ "1 * * * *" ]
+
+[env.production]
+kv_namespaces = [
+  { binding = "RunData", id = "e41f2f32dae64d9099d7afa63784a345" }
+]
+
+# The following secrets must be defined
+# - SPARKPOST_KEY
+# - GTOKEN_PRIVKEY
+# - GTOKEN_KID
+# Run `echo <VALUE> | wrangler secret put <NAME>` for each of these

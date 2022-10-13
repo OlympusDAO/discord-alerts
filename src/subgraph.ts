@@ -9,6 +9,7 @@ export const getClient = (url: string): Client => {
 };
 
 export const getLatestBlock = async (client: Client): Promise<number> => {
+  console.debug("Fetching latest block");
   const query = await client.query(BondSnapshotsLatestBlockQueryDocument, {}).toPromise();
 
   if (!query.data || query.data.bondSnapshots.length === 0) {
@@ -34,6 +35,7 @@ export type Snapshot = {
 export type SnapshotMap = Map<string, Snapshot>;
 
 export const getSnapshots = async (client: Client, block: number): Promise<SnapshotMap> => {
+  console.debug("Fetching snapshots at latest block");
   const query = await client.query(BondSnapshotsQueryDocument, { block: block }).toPromise();
 
   if (!query.data) {
