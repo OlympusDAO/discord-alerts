@@ -13,5 +13,7 @@ query BondSnapshotsQuery($block: BigInt!) {
     contractId
     price
     debtDecayIntervalSeconds
+    previousControlVariable
+    controlVariable
   }
 }

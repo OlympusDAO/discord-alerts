@@ -30,6 +30,8 @@ export type Snapshot = {
   contractId: number;
   price: number; // BigNumber?
   debtDecayIntervalSeconds: number;
+  previousControlVariable: number;
+  controlVariable: number;
 };
 
 export type SnapshotMap = Map<string, Snapshot>;

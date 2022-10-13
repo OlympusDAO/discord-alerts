@@ -32,6 +32,7 @@ export type BondSnapshot = {
   capacity: Scalars["BigDecimal"];
   contractAddress: Scalars["Bytes"];
   contractId: Scalars["BigInt"];
+  controlVariable: Scalars["BigInt"];
   date: Scalars["String"];
   debtDecayIntervalSeconds: Scalars["BigInt"];
   depositIntervalSeconds: Scalars["BigInt"];
@@ -52,6 +53,7 @@ export type BondSnapshot = {
   nextTuneInSeconds: Scalars["BigInt"];
   owner: Scalars["Bytes"];
   payoutToken: Scalars["Bytes"];
+  previousControlVariable: Scalars["BigInt"];
   price: Scalars["BigDecimal"];
   purchased: Scalars["BigDecimal"];
   quoteToken: Scalars["Bytes"];
@@ -97,6 +99,14 @@ export type BondSnapshot_Filter = {
   contractId_lte?: InputMaybe<Scalars["BigInt"]>;
   contractId_not?: InputMaybe<Scalars["BigInt"]>;
   contractId_not_in?: InputMaybe<Array<Scalars["BigInt"]>>;
+  controlVariable?: InputMaybe<Scalars["BigInt"]>;
+  controlVariable_gt?: InputMaybe<Scalars["BigInt"]>;
+  controlVariable_gte?: InputMaybe<Scalars["BigInt"]>;
+  controlVariable_in?: InputMaybe<Array<Scalars["BigInt"]>>;
+  controlVariable_lt?: InputMaybe<Scalars["BigInt"]>;
+  controlVariable_lte?: InputMaybe<Scalars["BigInt"]>;
+  controlVariable_not?: InputMaybe<Scalars["BigInt"]>;
+  controlVariable_not_in?: InputMaybe<Array<Scalars["BigInt"]>>;
   date?: InputMaybe<Scalars["String"]>;
   date_contains?: InputMaybe<Scalars["String"]>;
   date_contains_nocase?: InputMaybe<Scalars["String"]>;
@@ -309,6 +319,14 @@ export type BondSnapshot_Filter = {
   payoutToken_not?: InputMaybe<Scalars["Bytes"]>;
   payoutToken_not_contains?: InputMaybe<Scalars["Bytes"]>;
   payoutToken_not_in?: InputMaybe<Array<Scalars["Bytes"]>>;
+  previousControlVariable?: InputMaybe<Scalars["BigInt"]>;
+  previousControlVariable_gt?: InputMaybe<Scalars["BigInt"]>;
+  previousControlVariable_gte?: InputMaybe<Scalars["BigInt"]>;
+  previousControlVariable_in?: InputMaybe<Array<Scalars["BigInt"]>>;
+  previousControlVariable_lt?: InputMaybe<Scalars["BigInt"]>;
+  previousControlVariable_lte?: InputMaybe<Scalars["BigInt"]>;
+  previousControlVariable_not?: InputMaybe<Scalars["BigInt"]>;
+  previousControlVariable_not_in?: InputMaybe<Array<Scalars["BigInt"]>>;
   price?: InputMaybe<Scalars["BigDecimal"]>;
   price_gt?: InputMaybe<Scalars["BigDecimal"]>;
   price_gte?: InputMaybe<Scalars["BigDecimal"]>;
@@ -394,6 +412,7 @@ export enum BondSnapshot_OrderBy {
   Capacity = "capacity",
   ContractAddress = "contractAddress",
   ContractId = "contractId",
+  ControlVariable = "controlVariable",
   Date = "date",
   DebtDecayIntervalSeconds = "debtDecayIntervalSeconds",
   DepositIntervalSeconds = "depositIntervalSeconds",
@@ -414,6 +433,7 @@ export enum BondSnapshot_OrderBy {
   NextTuneInSeconds = "nextTuneInSeconds",
   Owner = "owner",
   PayoutToken = "payoutToken",
+  PreviousControlVariable = "previousControlVariable",
   Price = "price",
   Purchased = "purchased",
   QuoteToken = "quoteToken",
@@ -438,6 +458,8 @@ export type Query = {
   _meta?: Maybe<_Meta_>;
   bondSnapshot?: Maybe<BondSnapshot>;
   bondSnapshots: Array<BondSnapshot>;
+  tunedEvent?: Maybe<TunedEvent>;
+  tunedEvents: Array<TunedEvent>;
 };
 
 export type Query_MetaArgs = {
@@ -460,12 +482,30 @@ export type QueryBondSnapshotsArgs = {
   where?: InputMaybe<BondSnapshot_Filter>;
 };
 
+export type QueryTunedEventArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars["ID"];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+export type QueryTunedEventsArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars["Int"]>;
+  orderBy?: InputMaybe<TunedEvent_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars["Int"]>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<TunedEvent_Filter>;
+};
+
 export type Subscription = {
   __typename?: "Subscription";
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
   bondSnapshot?: Maybe<BondSnapshot>;
   bondSnapshots: Array<BondSnapshot>;
+  tunedEvent?: Maybe<TunedEvent>;
+  tunedEvents: Array<TunedEvent>;
 };
 
 export type Subscription_MetaArgs = {
@@ -487,6 +527,102 @@ export type SubscriptionBondSnapshotsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
   where?: InputMaybe<BondSnapshot_Filter>;
 };
+
+export type SubscriptionTunedEventArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars["ID"];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+export type SubscriptionTunedEventsArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars["Int"]>;
+  orderBy?: InputMaybe<TunedEvent_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars["Int"]>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<TunedEvent_Filter>;
+};
+
+export type TunedEvent = {
+  __typename?: "TunedEvent";
+  block: Scalars["BigInt"];
+  contractAddress: Scalars["Bytes"];
+  contractId: Scalars["BigInt"];
+  id: Scalars["ID"];
+  newControlVariable: Scalars["BigInt"];
+  previousControlVariable: Scalars["BigInt"];
+  timestamp: Scalars["BigInt"];
+};
+
+export type TunedEvent_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  block?: InputMaybe<Scalars["BigInt"]>;
+  block_gt?: InputMaybe<Scalars["BigInt"]>;
+  block_gte?: InputMaybe<Scalars["BigInt"]>;
+  block_in?: InputMaybe<Array<Scalars["BigInt"]>>;
+  block_lt?: InputMaybe<Scalars["BigInt"]>;
+  block_lte?: InputMaybe<Scalars["BigInt"]>;
+  block_not?: InputMaybe<Scalars["BigInt"]>;
+  block_not_in?: InputMaybe<Array<Scalars["BigInt"]>>;
+  contractAddress?: InputMaybe<Scalars["Bytes"]>;
+  contractAddress_contains?: InputMaybe<Scalars["Bytes"]>;
+  contractAddress_in?: InputMaybe<Array<Scalars["Bytes"]>>;
+  contractAddress_not?: InputMaybe<Scalars["Bytes"]>;
+  contractAddress_not_contains?: InputMaybe<Scalars["Bytes"]>;
+  contractAddress_not_in?: InputMaybe<Array<Scalars["Bytes"]>>;
+  contractId?: InputMaybe<Scalars["BigInt"]>;
+  contractId_gt?: InputMaybe<Scalars["BigInt"]>;
+  contractId_gte?: InputMaybe<Scalars["BigInt"]>;
+  contractId_in?: InputMaybe<Array<Scalars["BigInt"]>>;
+  contractId_lt?: InputMaybe<Scalars["BigInt"]>;
+  contractId_lte?: InputMaybe<Scalars["BigInt"]>;
+  contractId_not?: InputMaybe<Scalars["BigInt"]>;
+  contractId_not_in?: InputMaybe<Array<Scalars["BigInt"]>>;
+  id?: InputMaybe<Scalars["ID"]>;
+  id_gt?: InputMaybe<Scalars["ID"]>;
+  id_gte?: InputMaybe<Scalars["ID"]>;
+  id_in?: InputMaybe<Array<Scalars["ID"]>>;
+  id_lt?: InputMaybe<Scalars["ID"]>;
+  id_lte?: InputMaybe<Scalars["ID"]>;
+  id_not?: InputMaybe<Scalars["ID"]>;
+  id_not_in?: InputMaybe<Array<Scalars["ID"]>>;
+  newControlVariable?: InputMaybe<Scalars["BigInt"]>;
+  newControlVariable_gt?: InputMaybe<Scalars["BigInt"]>;
+  newControlVariable_gte?: InputMaybe<Scalars["BigInt"]>;
+  newControlVariable_in?: InputMaybe<Array<Scalars["BigInt"]>>;
+  newControlVariable_lt?: InputMaybe<Scalars["BigInt"]>;
+  newControlVariable_lte?: InputMaybe<Scalars["BigInt"]>;
+  newControlVariable_not?: InputMaybe<Scalars["BigInt"]>;
+  newControlVariable_not_in?: InputMaybe<Array<Scalars["BigInt"]>>;
+  previousControlVariable?: InputMaybe<Scalars["BigInt"]>;
+  previousControlVariable_gt?: InputMaybe<Scalars["BigInt"]>;
+  previousControlVariable_gte?: InputMaybe<Scalars["BigInt"]>;
+  previousControlVariable_in?: InputMaybe<Array<Scalars["BigInt"]>>;
+  previousControlVariable_lt?: InputMaybe<Scalars["BigInt"]>;
+  previousControlVariable_lte?: InputMaybe<Scalars["BigInt"]>;
+  previousControlVariable_not?: InputMaybe<Scalars["BigInt"]>;
+  previousControlVariable_not_in?: InputMaybe<Array<Scalars["BigInt"]>>;
+  timestamp?: InputMaybe<Scalars["BigInt"]>;
+  timestamp_gt?: InputMaybe<Scalars["BigInt"]>;
+  timestamp_gte?: InputMaybe<Scalars["BigInt"]>;
+  timestamp_in?: InputMaybe<Array<Scalars["BigInt"]>>;
+  timestamp_lt?: InputMaybe<Scalars["BigInt"]>;
+  timestamp_lte?: InputMaybe<Scalars["BigInt"]>;
+  timestamp_not?: InputMaybe<Scalars["BigInt"]>;
+  timestamp_not_in?: InputMaybe<Array<Scalars["BigInt"]>>;
+};
+
+export enum TunedEvent_OrderBy {
+  Block = "block",
+  ContractAddress = "contractAddress",
+  ContractId = "contractId",
+  Id = "id",
+  NewControlVariable = "newControlVariable",
+  PreviousControlVariable = "previousControlVariable",
+  Timestamp = "timestamp",
+}
 
 export type _Block_ = {
   __typename?: "_Block_";
@@ -544,6 +680,8 @@ export type BondSnapshotsQueryQuery = {
     contractId: number;
     price: number;
     debtDecayIntervalSeconds: number;
+    previousControlVariable: number;
+    controlVariable: number;
   }>;
 };
 
@@ -644,6 +782,8 @@ export const BondSnapshotsQueryDocument = {
                 { kind: "Field", name: { kind: "Name", value: "contractId" } },
                 { kind: "Field", name: { kind: "Name", value: "price" } },
                 { kind: "Field", name: { kind: "Name", value: "debtDecayIntervalSeconds" } },
+                { kind: "Field", name: { kind: "Name", value: "previousControlVariable" } },
+                { kind: "Field", name: { kind: "Name", value: "controlVariable" } },
               ],
             },
           },

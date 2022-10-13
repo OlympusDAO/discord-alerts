@@ -1,4 +1,4 @@
-schema: https://api.studio.thegraph.com/query/28103/bonds/0.0.13
+schema: https://api.studio.thegraph.com/query/28103/bonds/0.0.16
 documents: "./src/**/*.graphql"
 generates:
   ./src/generated/graphql-operations.ts:

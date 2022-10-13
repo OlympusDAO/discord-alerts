@@ -35,15 +35,22 @@ const isInBounds = (runData: SnapshotRunData, snapshot: Snapshot): BoundsResult 
     };
   }
 
-  const controlVariableSpeed = 0; // TODO add support for tuning
-  // debtDecayIntervalSeconds
+  const controlVariableSpeed =
+    snapshot.controlVariable === 0
+      ? 0
+      : snapshot.controlVariable > snapshot.previousControlVariable
+        ? 0
+        : (snapshot.controlVariable - snapshot.previousControlVariable) / snapshot.previousControlVariable;
   const percentageDecreasePerSecond = 1 / snapshot.debtDecayIntervalSeconds;
   const percentageDecreaseMultiplier = (1 - secondsInterval * percentageDecreasePerSecond) * (1 - controlVariableSpeed);
-  // We are fine if the snapshot price is greater than expected
   const minimumPrice = runData.price * percentageDecreaseMultiplier;
+  // We are fine if the snapshot price is greater than the minimum
   const result = snapshot.price > minimumPrice;
   console.log(`
   seconds: ${secondsInterval}
+  previousControlVariable: ${snapshot.previousControlVariable}
+  controlVariable: ${snapshot.controlVariable}
+  controlVariableSpeed: ${controlVariableSpeed}
   percentageDecreasePerSecond: ${percentageDecreasePerSecond}
   percentageDecreaseMultiplier: ${percentageDecreaseMultiplier}
   previous price: ${runData.price}
@@ -154,7 +161,7 @@ export default {
       validateEnvironment(env);
 
       // Grab the latest block
-      const client = getClient("https://api.studio.thegraph.com/query/28103/bonds/0.0.13");
+      const client = getClient("https://api.studio.thegraph.com/query/28103/bonds/0.0.16");
       const latestBlock = await getLatestBlock(client);
 
       // Grab snapshots at the latest block
