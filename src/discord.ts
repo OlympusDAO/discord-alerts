@@ -34,7 +34,7 @@ const executeWebhook = async (webhook: string, content: DiscordMessage): Promise
       "Content-Type": "application/json",
     },
   });
-  console.debug(await response.json());
+  console.log(await response.json());
 };
 
 export const sendAlert = async (

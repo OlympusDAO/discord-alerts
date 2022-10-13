@@ -9,7 +9,7 @@ export const getClient = (url: string): Client => {
 };
 
 export const getLatestBlock = async (client: Client): Promise<number> => {
-  console.debug("Fetching latest block");
+  console.log("Fetching latest block");
   const query = await client.query(BondSnapshotsLatestBlockQueryDocument, {}).toPromise();
 
   if (!query.data || query.data.bondSnapshots.length === 0) {
@@ -17,7 +17,7 @@ export const getLatestBlock = async (client: Client): Promise<number> => {
   }
 
   const latestBlock = query.data.bondSnapshots[0].block;
-  console.info(`Latest block is ${latestBlock}`);
+  console.log(`Latest block is ${latestBlock}`);
   return latestBlock;
 };
 
@@ -35,7 +35,7 @@ export type Snapshot = {
 export type SnapshotMap = Map<string, Snapshot>;
 
 export const getSnapshots = async (client: Client, block: number): Promise<SnapshotMap> => {
-  console.debug("Fetching snapshots at latest block");
+  console.log("Fetching snapshots at latest block");
   const query = await client.query(BondSnapshotsQueryDocument, { block: block }).toPromise();
 
   if (!query.data) {
@@ -43,7 +43,7 @@ export const getSnapshots = async (client: Client, block: number): Promise<Snaps
   }
 
   const results = query.data.bondSnapshots;
-  console.info(`Received ${results.length} records`);
+  console.log(`Received ${results.length} records`);
 
   // Extract the snapshots into the map
   const snapshotsMap = new Map<string, Snapshot>();

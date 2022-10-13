@@ -25,8 +25,39 @@ type BoundsResult = {
 };
 
 const isInBounds = (runData: SnapshotRunData, snapshot: Snapshot): BoundsResult => {
-  // TODO
-  return { result: false };
+  const secondsInterval = snapshot.timestamp - runData.timestamp;
+  if (secondsInterval < 0) {
+    console.log(
+      `Timestamp of previous run (${runData.timestamp}) is greater than the current snapshot (${snapshot.timestamp}), which indicates that subgraph reindexing is happening. Skipping.`,
+    );
+    return {
+      result: true,
+    };
+  }
+
+  const controlVariableSpeed = 0; // TODO add support for tuning
+  // debtDecayIntervalSeconds
+  const percentageDecreasePerSecond = 1 / snapshot.debtDecayIntervalSeconds;
+  const percentageDecreaseMultiplier = (1 - secondsInterval * percentageDecreasePerSecond) * (1 - controlVariableSpeed);
+  // We are fine if the snapshot price is greater than expected
+  const minimumPrice = runData.price * percentageDecreaseMultiplier;
+  const result = snapshot.price > minimumPrice;
+  console.log(`
+  seconds: ${secondsInterval}
+  percentageDecreasePerSecond: ${percentageDecreasePerSecond}
+  percentageDecreaseMultiplier: ${percentageDecreaseMultiplier}
+  previous price: ${runData.price}
+  previous price floor: ${minimumPrice}
+  current price: ${snapshot.price}
+  result: ${result}
+  `);
+  // TODO buffer
+  return {
+    result: result,
+    ...(!result && {
+      reason: `Current price of ${snapshot.price} was less than floor of ${minimumPrice}`,
+    }),
+  };
 };
 
 type SnapshotRunData = {
@@ -34,28 +65,34 @@ type SnapshotRunData = {
   price: number;
 };
 
+const setRunData = async (kv: KVNamespace, key: string, snapshot: Snapshot): Promise<void> => {
+  const runData = JSON.stringify({
+    timestamp: snapshot.timestamp,
+    price: snapshot.price,
+  });
+  await kv.put(key, runData);
+  console.log(`Stored runData: ${runData}`);
+};
+
 const checkSnapshot = async (kv: KVNamespace, webhookUrl: string, key: string, value: Snapshot): Promise<void> => {
-  console.debug(`Checking snapshot for contract ${value.contractAddress}, id ${value.contractId}`);
+  console.log(`Checking snapshot for contract ${value.contractAddress}, id ${value.contractId}`);
   // Grab the previous data
   const previousRunDataString = await kv.get(key);
 
   // If no previous data, store
   if (!previousRunDataString) {
-    const runData = JSON.stringify({
-      timestamp: value.timestamp,
-      price: value.price,
-    });
-    console.info(`No run data found for Bond contract ${key}. Storing: ${runData}`);
-    await kv.put(key, runData);
+    console.log(`No run data found for Bond contract ${key}.`);
+    await setRunData(kv, key, value);
     return;
   }
-  console.info(`Found run data: ${previousRunDataString}`);
+  console.log(`Found run data: ${previousRunDataString}`);
   const previousRunData = JSON.parse(previousRunDataString) as SnapshotRunData;
 
   // If within bounds, skip
   const boundsResult = isInBounds(previousRunData, value);
-  if (boundsResult.result === false) {
-    console.info(`Within bounds`);
+  if (boundsResult.result === true) {
+    console.log(`Within bounds`);
+    await setRunData(kv, key, value);
     return;
   }
 
@@ -91,17 +128,22 @@ const checkSnapshot = async (kv: KVNamespace, webhookUrl: string, key: string, v
 
   // Seconds between
   // Maximum bounds
+  // Subgraph data
+  // Tuning active
+
+  // Update runData
+  await setRunData(kv, key, value);
 };
 
 const validateEnvironment = (env: Env): void => {
-  console.debug("Validating environment");
+  console.log("Validating environment");
   if (!env.WEBHOOK_URL || env.WEBHOOK_URL.length === 0) {
     throw new Error("WEBHOOK_URL secret must be defined");
   }
   if (!env.RunData) {
     throw new Error("RunData must be defined");
   }
-  console.debug("Validated");
+  console.log("Validated");
 };
 
 export default {
@@ -112,7 +154,7 @@ export default {
       validateEnvironment(env);
 
       // Grab the latest block
-      const client = getClient("https://api.studio.thegraph.com/query/28103/bonds/0.0.9");
+      const client = getClient("https://api.studio.thegraph.com/query/28103/bonds/0.0.13");
       const latestBlock = await getLatestBlock(client);
 
       // Grab snapshots at the latest block
