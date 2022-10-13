@@ -7,11 +7,25 @@ export type EmbedField = {
 type Embed = {
   title: string;
   description: string;
-  content: string;
   fields?: EmbedField[];
 };
 
-const executeWebhook = async (webhook: string, content: Embed): Promise<void> => {
+type DiscordMessage = {
+  /**
+   * Text content displayed above any embeds.
+   */
+  content: string;
+  embeds: Embed[];
+};
+
+/**
+ * We send a POST request using fetch() as that is what is supported in Cloudflare workers.
+ * npm packages for Discord webhooks don't seem to support fetch(), so we roll our own.
+ *
+ * @param webhook
+ * @param content
+ */
+const executeWebhook = async (webhook: string, content: DiscordMessage): Promise<void> => {
   console.log(JSON.stringify(content));
   const response = await fetch(webhook, {
     method: "POST",
@@ -30,9 +44,13 @@ export const sendAlert = async (
   fields: EmbedField[],
 ): Promise<void> => {
   await executeWebhook(webhook, {
-    title: title,
-    description: description,
-    content: description,
-    fields: fields,
+    content: "",
+    embeds: [
+      {
+        title: title,
+        description: description,
+        fields: fields,
+      },
+    ],
   });
 };

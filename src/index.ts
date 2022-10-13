@@ -60,21 +60,36 @@ const checkSnapshot = async (kv: KVNamespace, webhookUrl: string, key: string, v
 
   // Otherwise alert in Discord
   console.warn(`Out of bounds`);
-  await sendAlert(
-    webhookUrl,
-    `Alert: Bond Price Out of Bounds`,
-    `Price ${value.price} at time ${value.date} is out of bounds.`,
-    [
-      {
-        name: "Contract",
-        value: value.contractAddress,
-      },
-      {
-        name: "ID",
-        value: value.contractId.toString(),
-      },
-    ],
-  );
+  await sendAlert(webhookUrl, `🚨 Bonds`, `Bond price ${value.price} is out of bounds.`, [
+    {
+      name: "Contract",
+      value: `https://etherscan.io/address/${value.contractAddress}`,
+      inline: false,
+    },
+    {
+      name: "ID",
+      value: value.contractId.toString(),
+      inline: false,
+    },
+    {
+      name: "Date",
+      value: value.date,
+      inline: false,
+    },
+    {
+      name: "Previous Price",
+      value: previousRunData.price.toString(),
+      inline: false,
+    },
+    {
+      name: "Previous Timestamp",
+      value: previousRunData.timestamp.toString(),
+      inline: true,
+    },
+  ]);
+
+  // Seconds between
+  // Maximum bounds
 };
 
 const validateEnvironment = (env: Env): void => {
