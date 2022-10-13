@@ -19,14 +19,14 @@ export interface Env {
   WEBHOOK_URL: string;
 }
 
-/**
- * Runtime variables
- * - Webhook
- */
+type BoundsResult = {
+  result: boolean;
+  reason?: string;
+};
 
-const isInBounds = (runData: SnapshotRunData, snapshot: Snapshot): boolean => {
+const isInBounds = (runData: SnapshotRunData, snapshot: Snapshot): BoundsResult => {
   // TODO
-  return false;
+  return { result: false };
 };
 
 type SnapshotRunData = {
@@ -53,9 +53,15 @@ const checkSnapshot = async (kv: KVNamespace, webhookUrl: string, key: string, v
   const previousRunData = JSON.parse(previousRunDataString) as SnapshotRunData;
 
   // If within bounds, skip
-  if (isInBounds(previousRunData, value)) {
+  const boundsResult = isInBounds(previousRunData, value);
+  if (boundsResult.result === false) {
     console.info(`Within bounds`);
     return;
+  }
+
+  // Sanity-check
+  if (boundsResult.reason === undefined) {
+    throw new Error("boundsResult was true, but reason was not set");
   }
 
   // Otherwise alert in Discord
@@ -77,14 +83,9 @@ const checkSnapshot = async (kv: KVNamespace, webhookUrl: string, key: string, v
       inline: false,
     },
     {
-      name: "Previous Price",
-      value: previousRunData.price.toString(),
+      name: "Reason",
+      value: boundsResult.reason,
       inline: false,
-    },
-    {
-      name: "Previous Timestamp",
-      value: previousRunData.timestamp.toString(),
-      inline: true,
     },
   ]);
 
@@ -104,6 +105,7 @@ const validateEnvironment = (env: Env): void => {
 };
 
 export default {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
     try {
       // Validate environment
