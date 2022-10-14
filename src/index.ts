@@ -192,5 +192,6 @@ export default {
       // TODO handle failure
       console.log(e);
     }
+    console.log("Done");
   },
 };
