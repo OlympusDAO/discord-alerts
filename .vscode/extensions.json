@@ -2,6 +2,8 @@
     "recommendations": [
         "dbaeumer.vscode-eslint",
         "bungcip.better-toml",
-        "Gruntfuggly.todo-tree"
+        "gruntfuggly.todo-tree",
+        "mquandalle.graphql",
+        "redhat.vscode-yaml"
     ]
 }
