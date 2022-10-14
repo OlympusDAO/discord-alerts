@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "dbaeumer.vscode-eslint",
-        "bungcip.better-toml"
+        "bungcip.better-toml",
+        "Gruntfuggly.todo-tree"
     ]
 }
