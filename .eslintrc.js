@@ -34,7 +34,7 @@ module.exports = {
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/ban-ts-ignore": "off",
-    "no-async-foreach/no-async-foreach": 2
+    "no-async-foreach/no-async-foreach": 2,
   },
   ignorePatterns: ["build", "node_modules"],
   globals: {
