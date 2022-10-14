@@ -25,8 +25,8 @@ type BoundsResult = {
 };
 
 const isInBounds = (runData: SnapshotRunData, snapshot: Snapshot): BoundsResult => {
-  const secondsInterval = snapshot.timestamp - runData.timestamp;
-  if (secondsInterval < 0) {
+  const secondsElapsed = snapshot.timestamp - runData.timestamp;
+  if (secondsElapsed < 0) {
     console.log(
       `Timestamp of previous run (${runData.timestamp}) is greater than the current snapshot (${snapshot.timestamp}), which indicates that subgraph reindexing is happening. Skipping.`,
     );
@@ -35,34 +35,56 @@ const isInBounds = (runData: SnapshotRunData, snapshot: Snapshot): BoundsResult 
     };
   }
 
+  /**
+   * In case the check runs after a long time, we need to use the minimum of the respective interval settings
+   * and the seconds between checks.
+   */
+  const debtDecaySecondsElapsed = Math.min(snapshot.debtDecayIntervalSeconds, secondsElapsed);
+  const tuneSecondsElapsed = Math.min(snapshot.tuneAdjustmentDelaySeconds, secondsElapsed);
+
+  /**
+   * The control variable (related to periodic tuning)
+   */
   const controlVariableSpeed =
-    snapshot.controlVariable === 0
+    // No tuning, therefore no controlVariable, so speed is 0
+    snapshot.controlVariable === 0 || snapshot.previousControlVariable === 0
       ? 0
-      : snapshot.controlVariable > snapshot.previousControlVariable
-        ? 0
-        : (snapshot.controlVariable - snapshot.previousControlVariable) / snapshot.previousControlVariable;
-  const percentageDecreasePerSecond = 1 / snapshot.debtDecayIntervalSeconds;
-  const percentageDecreaseMultiplier = (1 - secondsInterval * percentageDecreasePerSecond) * (1 - controlVariableSpeed);
-  const minimumPrice = runData.price * percentageDecreaseMultiplier;
+      : // We only care if the controlVariable is decreasing
+      snapshot.controlVariable > snapshot.previousControlVariable
+      ? 0
+      : // Rate of change of the controlVariable
+        (snapshot.previousControlVariable - snapshot.controlVariable) / snapshot.previousControlVariable;
+  const controlVariableSpeedPerSecond = controlVariableSpeed / snapshot.tuneAdjustmentDelaySeconds;
+
+  /**
+   * The debt decay
+   */
+  const debtDecayPerSecond = 1 / snapshot.debtDecayIntervalSeconds;
+
+  /**
+   * Calculate the minimum price that we expect
+   */
+  const BUFFER = 0.0025;
+  const percentageDecreaseMultiplier =
+    (1 - debtDecaySecondsElapsed * debtDecayPerSecond) * (1 - tuneSecondsElapsed * controlVariableSpeedPerSecond);
+  const percentageDecreaseMultiplierWithBuffer = (1 - BUFFER) * percentageDecreaseMultiplier;
+  const minimumPrice = runData.price * percentageDecreaseMultiplierWithBuffer;
+
   // We are fine if the snapshot price is greater than the minimum
   const result = snapshot.price > minimumPrice;
-  console.log(`
-  seconds: ${secondsInterval}
-  previousControlVariable: ${snapshot.previousControlVariable}
-  controlVariable: ${snapshot.controlVariable}
-  controlVariableSpeed: ${controlVariableSpeed}
-  percentageDecreasePerSecond: ${percentageDecreasePerSecond}
-  percentageDecreaseMultiplier: ${percentageDecreaseMultiplier}
-  previous price: ${runData.price}
-  previous price floor: ${minimumPrice}
-  current price: ${snapshot.price}
-  result: ${result}
-  `);
-  // TODO buffer
+
   return {
     result: result,
     ...(!result && {
-      reason: `Current price of ${snapshot.price} was less than floor of ${minimumPrice}`,
+      reason: `Current price of ${snapshot.price} less than the floor.
+      
+      Previous price: ${runData.price}
+      
+      Multiplier: ${percentageDecreaseMultiplier}
+
+      Buffer: ${(BUFFER * 100).toFixed(2)}%
+      
+      Floor: ${minimumPrice}`,
     }),
   };
 };
@@ -113,7 +135,7 @@ const checkSnapshot = async (kv: KVNamespace, webhookUrl: string, key: string, v
   await sendAlert(webhookUrl, `🚨 Bonds`, `Bond price ${value.price} is out of bounds.`, [
     {
       name: "Contract",
-      value: `https://etherscan.io/address/${value.contractAddress}`,
+      value: `https://etherscan.io/address/${value.contractAddress}#readContract`,
       inline: false,
     },
     {
@@ -132,11 +154,6 @@ const checkSnapshot = async (kv: KVNamespace, webhookUrl: string, key: string, v
       inline: false,
     },
   ]);
-
-  // Seconds between
-  // Maximum bounds
-  // Subgraph data
-  // Tuning active
 
   // Update runData
   await setRunData(kv, key, value);

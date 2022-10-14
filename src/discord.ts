@@ -26,7 +26,7 @@ type DiscordMessage = {
  * @param content
  */
 const executeWebhook = async (webhook: string, content: DiscordMessage): Promise<void> => {
-  console.log(JSON.stringify(content));
+  console.log(`Sending request to Discord webhook: ${JSON.stringify(content, null, 2)}`);
   const response = await fetch(webhook, {
     method: "POST",
     body: JSON.stringify(content),
@@ -34,7 +34,10 @@ const executeWebhook = async (webhook: string, content: DiscordMessage): Promise
       "Content-Type": "application/json",
     },
   });
-  console.log(await response.json());
+
+  if (!response.ok) {
+    console.log(`Encountered error with Discord webhook: ${response.body}`);
+  }
 };
 
 export const sendAlert = async (

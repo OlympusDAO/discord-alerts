@@ -15,5 +15,6 @@ query BondSnapshotsQuery($block: BigInt!) {
     debtDecayIntervalSeconds
     previousControlVariable
     controlVariable
+    tuneAdjustmentDelaySeconds
   }
 }

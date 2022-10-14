@@ -8,8 +8,8 @@ generates:
     - typed-document-node
    config:
       scalars:
-        BigDecimal: number
-        BigInt: number
+        BigDecimal: string
+        BigInt: string
         Bytes: Uint8Array # https://thegraph.com/docs/en/developing/assemblyscript-api/#bytes
    hooks:
     afterOneFileWrite:

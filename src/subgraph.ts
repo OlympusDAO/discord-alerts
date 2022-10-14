@@ -18,7 +18,7 @@ export const getLatestBlock = async (client: Client): Promise<number> => {
 
   const latestBlock = query.data.bondSnapshots[0].block;
   console.log(`Latest block is ${latestBlock}`);
-  return latestBlock;
+  return parseInt(latestBlock);
 };
 
 // We define our own type, as we do not need all of the fields in BondSnapshot
@@ -28,17 +28,18 @@ export type Snapshot = {
   timestamp: number;
   contractAddress: string;
   contractId: number;
-  price: number; // BigNumber?
+  price: number;
   debtDecayIntervalSeconds: number;
   previousControlVariable: number;
   controlVariable: number;
+  tuneAdjustmentDelaySeconds: number;
 };
 
 export type SnapshotMap = Map<string, Snapshot>;
 
 export const getSnapshots = async (client: Client, block: number): Promise<SnapshotMap> => {
   console.log("Fetching snapshots at latest block");
-  const query = await client.query(BondSnapshotsQueryDocument, { block: block }).toPromise();
+  const query = await client.query(BondSnapshotsQueryDocument, { block: block.toString() }).toPromise();
 
   if (!query.data) {
     throw new Error("Unable to obtain snapshots");
@@ -57,9 +58,24 @@ export const getSnapshots = async (client: Client, block: number): Promise<Snaps
       throw new Error(`Did not expect to find existing value for snapshot map id ${snapshotMapId}`);
     }
 
+    /**
+     * Even though the values are typed, the GraphQL client doesn't convert the values into the right type.
+     *
+     * The GraphQL schema is configured to expect strings, which we then explicitly convert to numbers.
+     *
+     * Of the numbers in the results, only price is expected to be a float.
+     */
+    console.log(`Transforming received snapshot: ${JSON.stringify(value, null, 2)}`);
     const compatibleValue: Snapshot = {
       ...value,
+      timestamp: parseInt(value.timestamp),
       contractAddress: value.contractAddress.toString(),
+      contractId: parseInt(value.contractId),
+      price: parseFloat(value.price),
+      debtDecayIntervalSeconds: parseInt(value.debtDecayIntervalSeconds),
+      previousControlVariable: parseInt(value.previousControlVariable),
+      controlVariable: parseInt(value.controlVariable),
+      tuneAdjustmentDelaySeconds: parseInt(value.tuneAdjustmentDelaySeconds),
     };
 
     snapshotsMap.set(snapshotMapId, compatibleValue);

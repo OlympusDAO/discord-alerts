@@ -11,8 +11,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  BigDecimal: number;
-  BigInt: number;
+  BigDecimal: string;
+  BigInt: string;
   Bytes: Uint8Array;
 };
 
@@ -662,7 +662,7 @@ export type BondSnapshotsLatestBlockQueryQueryVariables = Exact<{ [key: string]:
 
 export type BondSnapshotsLatestBlockQueryQuery = {
   __typename?: "Query";
-  bondSnapshots: Array<{ __typename?: "BondSnapshot"; block: number }>;
+  bondSnapshots: Array<{ __typename?: "BondSnapshot"; block: string }>;
 };
 
 export type BondSnapshotsQueryQueryVariables = Exact<{
@@ -675,13 +675,14 @@ export type BondSnapshotsQueryQuery = {
     __typename?: "BondSnapshot";
     id: string;
     date: string;
-    timestamp: number;
+    timestamp: string;
     contractAddress: Uint8Array;
-    contractId: number;
-    price: number;
-    debtDecayIntervalSeconds: number;
-    previousControlVariable: number;
-    controlVariable: number;
+    contractId: string;
+    price: string;
+    debtDecayIntervalSeconds: string;
+    previousControlVariable: string;
+    controlVariable: string;
+    tuneAdjustmentDelaySeconds: string;
   }>;
 };
 
@@ -784,6 +785,7 @@ export const BondSnapshotsQueryDocument = {
                 { kind: "Field", name: { kind: "Name", value: "debtDecayIntervalSeconds" } },
                 { kind: "Field", name: { kind: "Name", value: "previousControlVariable" } },
                 { kind: "Field", name: { kind: "Name", value: "controlVariable" } },
+                { kind: "Field", name: { kind: "Name", value: "tuneAdjustmentDelaySeconds" } },
               ],
             },
           },
