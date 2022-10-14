@@ -32,6 +32,8 @@ The `wrangler.toml` file defines two deployments in Cloudflare Workers:
 
 There is a separate key-value store binding for each, and secrets are also separate.
 
+To deploy, run: `yarn deploy`
+
 ## Secrets
 
 - The following secrets are required in order to run:
