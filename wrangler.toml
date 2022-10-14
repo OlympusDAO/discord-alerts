@@ -8,7 +8,8 @@ kv_namespaces = [
 ]
 
 [triggers]
-crons = [ "1 * * * *" ]
+# Run every minute
+crons = [ "* * * * *" ]
 
 [env.production]
 kv_namespaces = [
