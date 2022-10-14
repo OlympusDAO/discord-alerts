@@ -159,39 +159,52 @@ const checkSnapshot = async (kv: KVNamespace, webhookUrl: string, key: string, v
   await setRunData(kv, key, value);
 };
 
-const validateEnvironment = (env: Env): void => {
+const validateEnvironment = (): void => {
   console.log("Validating environment");
-  if (!env.WEBHOOK_URL || env.WEBHOOK_URL.length === 0) {
+  if (!WEBHOOK_URL || WEBHOOK_URL.length === 0) {
     throw new Error("WEBHOOK_URL secret must be defined");
   }
-  if (!env.RunData) {
+  if (!RunData) {
     throw new Error("RunData must be defined");
   }
   console.log("Validated");
 };
 
-export default {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
-    try {
-      // Validate environment
-      validateEnvironment(env);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function handler(request: Request): Promise<Response> {
+  try {
+    // Validate environment
+    validateEnvironment();
 
-      // Grab the latest block
-      const client = getClient("https://api.studio.thegraph.com/query/28103/bonds/0.0.16");
-      const latestBlock = await getLatestBlock(client);
+    // Grab the latest block
+    const client = getClient("https://api.studio.thegraph.com/query/28103/bonds/0.0.16");
+    const latestBlock = await getLatestBlock(client);
 
-      // Grab snapshots at the latest block
-      const snapshotMap: SnapshotMap = await getSnapshots(client, latestBlock);
+    // Grab snapshots at the latest block
+    const snapshotMap: SnapshotMap = await getSnapshots(client, latestBlock);
 
-      // Loop through contracts
-      for (const [key, value] of snapshotMap) {
-        checkSnapshot(env.RunData, env.WEBHOOK_URL, key, value);
-      }
-    } catch (e: unknown) {
-      // TODO handle failure
-      console.log(e);
+    // Loop through contracts
+    for (const [key, value] of snapshotMap) {
+      await checkSnapshot(RunData, WEBHOOK_URL, key, value);
     }
-    console.log("Done");
-  },
-};
+
+    console.log("Done with check");
+
+    return new Response(null, {
+      status: 200,
+      statusText: "Success",
+    });
+  } catch (e: unknown) {
+    console.log("Encountered unexpected error:");
+    console.log(e);
+
+    return new Response(null, {
+      status: 500,
+      statusText: e instanceof Error ? e.message : "Unknown type",
+    });
+  }
+}
+
+addEventListener("fetch", (event: FetchEvent) => {
+  event.respondWith(handler(event.request));
+});

@@ -27,7 +27,7 @@
   "scripts": {
     "start": "wrangler dev --local",
     "deploy": "wrangler publish",
-    "trigger": "curl http://localhost:8787/cdn-cgi/mf/scheduled",
+    "trigger": "curl http://localhost:8787/",
     "codegen": "graphql-codegen",
     "lint": "eslint --config ./.eslintrc.js ./src/ --ext .jsx,.js,.tsx,.ts",
     "lint:fix": "prettier --write ./src/ & yarn lint --fix"

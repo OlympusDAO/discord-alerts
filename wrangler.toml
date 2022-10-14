@@ -7,10 +7,6 @@ kv_namespaces = [
   { binding = "RunData", id = "ab468d73d63f4c7f957392a78faaf146", preview_id = "ab468d73d63f4c7f957392a78faaf146" }
 ]
 
-[triggers]
-# Run every minute
-crons = [ "* * * * *" ]
-
 [env.production]
 kv_namespaces = [
   { binding = "RunData", id = "e41f2f32dae64d9099d7afa63784a345" }
