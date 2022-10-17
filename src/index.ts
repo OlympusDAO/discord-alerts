@@ -177,7 +177,7 @@ async function handler(request: Request): Promise<Response> {
     validateEnvironment();
 
     // Grab the latest block
-    const client = getClient("https://api.studio.thegraph.com/query/28103/bonds/0.0.16");
+    const client = getClient("https://api.thegraph.com/subgraphs/name/olympusdao/bonds");
     const latestBlock = await getLatestBlock(client);
 
     // Grab snapshots at the latest block
