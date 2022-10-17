@@ -21,7 +21,7 @@ Initially, the inbuilt Cloudflare Workers cron trigger was used. However, it req
 - No response and hence no status code, which means we can't monitor errors
 - Scheduled workers behave differently and aren't documented well
 
-The (StatusCake)[https://app.statuscake.com/] uptime service is used instead to perform an HTTP request against the Cloudflare Workers URL (in the format https://<prefix>.workers.dev/), which triggers the check. If the Cloudflare Workers URL takes too long to respond, or returns a status that is not `200`, the alerts channel in the Discord work server will receive a message.
+The [StatusCake](https://app.statuscake.com/) uptime service is used instead to perform an HTTP request against the Cloudflare Workers URL (in the format https://<prefix>.workers.dev/), which triggers the check. If the Cloudflare Workers URL takes too long to respond, or returns a status that is not `200`, the alerts channel in the Discord work server will receive a message.
 
 ## Deployment
 
@@ -53,11 +53,11 @@ To deploy to production, run: `yarn deploy:production`
 
 StatusCake:
 
-- @0xJem
+- [Jem](https://github.com/0xJem)
 
 Cloudflare Workers:
 
-- @0xJem
-- @0xLienid
-- @appleseed-iii
-- @brightiron
+- [Jem](https://github.com/0xJem)
+- [Lienid](https://github.com/0xLienid)
+- [Appleseed](https://github.com/appleseed-iii)
+- [brightiron](https://github.com/brightiron)
