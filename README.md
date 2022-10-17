@@ -21,7 +21,7 @@ Initially, the inbuilt Cloudflare Workers cron trigger was used. However, it req
 - No response and hence no status code, which means we can't monitor errors
 - Scheduled workers behave differently and aren't documented well
 
-Using an external trigger (UptimeRobot) gives the best outcome.
+The (StatusCake)[https://app.statuscake.com/] uptime service is used instead to perform an HTTP request against the Cloudflare Workers URL (in the format https://<prefix>.workers.dev/), which triggers the check. If the Cloudflare Workers URL takes too long to respond, or returns a status that is not `200`, the alerts channel in the Discord work server will receive a message.
 
 ## Deployment
 
@@ -34,7 +34,7 @@ There is a separate key-value store binding for each, and secrets are also separ
 
 To deploy to staging, run: `yarn deploy`
 
-To deploy to production, run: `yarn deploy --env production`
+To deploy to production, run: `yarn deploy:production`
 
 ## Secrets
 
@@ -48,3 +48,16 @@ To deploy to production, run: `yarn deploy --env production`
 - Copy the `.dev.vars.sample` file to `.dev.vars` and fill in the variable(s).
 - Run `yarn start` to run the worker function locally
 - Run `yarn trigger` in a new terminal to trigger accessing the worker function, and watch the output in the terminal that `yarn start` was run in.
+
+## Account Access
+
+StatusCake:
+
+- @0xJem
+
+Cloudflare Workers:
+
+- @0xJem
+- @0xLienid
+- @appleseed-iii
+- @brightiron

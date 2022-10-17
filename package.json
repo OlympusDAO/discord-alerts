@@ -27,6 +27,7 @@
   "scripts": {
     "start": "wrangler dev --local",
     "deploy": "wrangler publish",
+    "deploy:production": "wrangler publish --env production",
     "trigger": "curl http://localhost:8787/",
     "codegen": "graphql-codegen",
     "lint": "eslint --config ./.eslintrc.js ./src/ --ext .jsx,.js,.tsx,.ts",
