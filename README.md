@@ -4,6 +4,8 @@ Provides alerts in Discord when bonds behave abnormally.
 
 The scope will be expanded in the future to support different metrics.
 
+**NOTE**: this is currently not in use.
+
 ## Architecture
 
 - A simple function is deployed on Cloudflare Workers to fetch bond snapshots and check that they are within set bounds. If out of bounds, a Discord message is sent.
